@@ -709,7 +709,7 @@ for j in range(start1, end1):
 # for i in range(len(distance)):
 mean = np.mean(list_of_maxclustersize) # 最大クラスタサイズの平均値
 
-plt.figure(figsize=(15,4))
+plt.fistart_pointigsize=(15,4))
 plt.plot(selected_time1, list_of_maxclustersize, label="maximum")
 plt.plot(selected_time1, list_of_minclustersize, c="black", label="minimum")
 plt.plot([start1, end1],[mean, mean], "red", linestyle='dashed', label="mean of maximum") # 平均値を示す補助線
@@ -722,9 +722,14 @@ plt.title("Relationship between time, maximum clustersize and minimum clustersiz
 plt.legend()
 plt.show()
 
+# %% [markdown]
+# ### クラスタサイズ別時間変化
+
 # %%
+start_point = 0
+end_point = 70000
 sizecount = []
-for i in range(90000, 100200):
+for i in range(start_point, end_point+1):
     labels = hierachical_clustering("single",i,35)[1] # 各点のラベル
 
     clusters_size = np.bincount(labels) # ラベル別のクラスタサイズ
@@ -741,8 +746,8 @@ plt.figure(figsize=(20,20))
 plt.subplots_adjust(hspace=1)
 for i in range(2, 10):
     plt.subplot(8,1,i-1)
-    plt.plot([s[i] for s in sizecount])
-    plt.ylim(0,10)
+    plt.plot([x/10 for x in range(start_point, end_point+1)],[s[i] for s in sizecount])
+    plt.ylim(0,15)
     plt.title("clustersize = %d" %i)
     plt.ylabel("the number of clusters")
     plt.xlabel("time")
