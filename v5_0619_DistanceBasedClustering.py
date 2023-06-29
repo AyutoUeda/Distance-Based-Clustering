@@ -314,7 +314,7 @@ def plot_coordinate(str, num1, num2, num3):
 # plot_coordinate --> クラスタサイズが1のものを除く、クラスタの中心をプロットする、クラスタ半径をプロットする
 
 # %%
-plot_coordinate("single", 30, 35, 70000)
+plot_coordinate("single", 30, 35, 60000)
 
 
 # %% [markdown]
