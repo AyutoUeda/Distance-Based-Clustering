@@ -19,7 +19,7 @@
 # 2. 中心位置のコントロール  
 # 3. 計算時間の拡大 -> 0秒目から
 
-# %% slideshow={"slide_type": "skip"}
+# %% slideshow={"slide_type": "skip"} jupyter={"source_hidden": true}
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -234,35 +234,6 @@ def calculate_radius(arg1, arg2):
             R = r
     return R
 
-
-# %% [markdown]
-# test
-
-# %% jupyter={"outputs_hidden": true}
-import matplotlib.patches as patches
-
-points = [[3,4], [1,1], [4,5],[2,6]]
-
-x, y = zip(*points)
-center = calculate_center(points)
-print("中心座標:", center)
-
-R = calculate_radius(points, center)
-
-fig, ax = plt.subplots(figsize=(6,6))
-
-# 中心座標の描画
-x1= center[0]
-y1 = center[1]
-
-plt.plot(x, y, ".")
-plt.plot(x1, y1, "x")
-
-# 円の描画
-c = patches.Circle(center, R, alpha=0.3,facecolor='blue', edgecolor='black')
-ax.add_patch(c)
-
-plt.show()
 
 # %% [markdown]
 # # ■実験結果
