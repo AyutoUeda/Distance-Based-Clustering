@@ -399,46 +399,60 @@ for i in range(10000, 130000, 10000):
 # %%
 # %%time
 
-y_radius = []
-y_clustersize = []
+# y_radius = []
+# y_clustersize = []
 
-time_start = 50000
+time_start = 0
 time_end = 100000
+span = 10000
 # x = [s for s in range(time_start, time_end+1)]
 
-coordinate_of_max_center = []
-coordinate_of_centers = []
+# coordinate_of_max_center = []
+# coordinate_of_centers = []
 
-for i in range(time_start, time_end+1):
-    distance_threshold = 35
-    model = hierachical_clustering("single", i, distance_threshold)[3]
 
-    nclusters = model.n_clusters_ # クラスタサイズ1を含めた全クラスタ数
+for i in range(time_start, time_end, span):
+    y_radius = []
+    y_clustersize = []
+    coordinate_of_max_center = []
+    coordinate_of_centers = []
+    for j in range(i, i+span):
+        distance_threshold = 35
+        model = hierachical_clustering("single", j, distance_threshold)[3]
 
-    X = np.array(hierachical_clustering("single", i, distance_threshold)[2]) # 各点の座標データ
+        nclusters = model.n_clusters_ # クラスタサイズ1を含めた全クラスタ数
 
-    labels = model.labels_
+        X = np.array(hierachical_clustering("single", j, distance_threshold)[2]) # 各点の座標データ
 
-    clusters_size = np.bincount(labels) # <-- ラベル別のクラスタサイズ
+        labels = model.labels_
 
-    n = sum(x>1 for x in clusters_size) # <--クラスタサイズが1より大きいものの数
+        clusters_size = np.bincount(labels) # <-- ラベル別のクラスタサイズ
 
-    # クラスタの中心座標
-    centers = calculate_cluster_centers(labels, X, clusters_size)[0]    
-    cnt = np.array(centers)
+        n = sum(x>1 for x in clusters_size) # <--クラスタサイズが1より大きいものの数
+
+        # クラスタの中心座標
+        centers = calculate_cluster_centers(labels, X, clusters_size)[0]    
+        cnt = np.array(centers)
+
+        coordinate_of_centers.append(centers)
+
+        # クラスタ半径
+        radius = calculate_cluster_centers(labels, X, clusters_size)[1]
+
+        maxradius = max(radius)
+        max_index = radius.index(maxradius)
+
+        y_radius.append(maxradius)
+        y_clustersize.append(clusters_size[max_index])
+
+        coordinate_of_max_center.append(centers[max_index])
     
-    coordinate_of_centers.append(centers)
-    
-    # クラスタ半径
-    radius = calculate_cluster_centers(labels, X, clusters_size)[1]
-    
-    maxradius = max(radius)
-    max_index = radius.index(maxradius)
-    
-    y_radius.append(maxradius)
-    y_clustersize.append(clusters_size[max_index])
-    
-    coordinate_of_max_center.append(centers[max_index])
+    plt.figure(figsize=(6,6))
+    values = np.array(coordinate_of_max_center)
+    plt.scatter(values[:, 0],values[:, 1], marker="x")
+    plt.xlim(0, 430)
+    plt.ylim(0, 430)
+    plt.title("Location of the cluster center with the maximum radius \n time=%d - %d (s)" %(i /10, (i+span)/10))
 
 # %% [markdown]
 # 10000行実行→2min 38s
