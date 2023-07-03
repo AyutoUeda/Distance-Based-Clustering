@@ -19,7 +19,7 @@
 # 2. 中心位置のコントロール  
 # 3. 計算時間の拡大 -> 0秒目から
 
-# %% slideshow={"slide_type": "skip"} jupyter={"source_hidden": true}
+# %% slideshow={"slide_type": "skip"}
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -92,17 +92,60 @@ def exception_size1(labels):
 labels = hierachical_clustering("single",10000, 35)[1]
 exception_size1(labels)
 
-
 # %% [markdown]
 # **cluster_sizeの見方**  
 # [9 2 6 2 1 5 2 1 1 1 1 3 4 1 4 1 1 1 1 1 1 1 1 1 1 1 2 1 1 2]  
 # →クラスタナンバー0に分類されているものが9個、クラスタナンバー1に分類されているものが2個....
 
 # %% [markdown]
-# ## 1.3 中心座標を求める関数
+# ## 1.3 クラスタ半径を求める関数
 
 # %% [markdown]
-# ### 1.3.1中心座標を計算
+# **半径を求めるために使用した式(クラスタの一番端を採用)**  →  
+# $$
+#     \textrm{中心座標　} \ \vec{r_g}= (x_g, y_g)\\
+#     \textrm{点の座標　} \ \vec{r_p}= (x_p, y_p)\\
+#     R=\sqrt{(x_p - x_g)^2+(y_p - y_g)^2}
+# $$
+
+# %% [markdown]
+# $$
+#     \textrm{中心座標　} \ \vec{r_g}= (x_g, y_g)\\
+#     \textrm{クラスタ半径　} \ \vec{R} = \sqrt{\sum_{i=1}^{n}(\vec{r_i}-\vec{r_g})^2} 
+# $$
+
+# %% [markdown]
+# $$
+#     \sqrt{\sum_{i=1}^{n}((x_i-a)^2 + (y_i-a)^2)}
+# $$
+
+# %%
+import math
+
+def calculate_radius(arg1, arg2):
+    '''
+    引数
+    arg1 --> 各点の座標リスト [[x1,y1], [x2,y2], ....]
+    arg2 --> 中心座標 [x, y]
+    '''
+    points = np.array(arg1)
+    center = np.array(arg2)
+
+    R = 0
+
+    for point in points:
+        a = np.abs(point-center) # ベクトルの差
+        r = math.sqrt(a[0]**2 + a[1]**2)
+        if r > R:
+            R = r
+    return R
+
+
+# %% [markdown]
+# ## 1.4 中心座標を求める関数
+
+# %% [markdown]
+# ### 1.4.1中心座標を計算
 
 # %%
 def calculate_center(arg1):
@@ -126,7 +169,7 @@ def calculate_center(arg1):
 # **戻り値**は中心座標 [xxx, yyy]
 
 # %% [markdown]
-# ### 1.3.2 クラスタごとに中心座標を算出する関数
+# ### 1.4.2 クラスタごとに中心座標とその半径を算出する関数 calculate_cluster_centers
 
 # %%
 # test data
@@ -161,7 +204,7 @@ def calculate_cluster_centers(labels, coordinate, c_size):
 # %% [markdown]
 # **引数**  
 # labels --> 各点のクラスタラベル（要素60個）  
-# coordinate --> 各点の座標データ  
+# coordinate --> 各点の座標データ (要素60)  
 # c_size --> ラベルごとのクラスタサイズ　([9,3,2,1...] <-- クラスタラベル1のサイズは9、クラスタラベル2のサイズは2...)
 
 # %%
@@ -190,50 +233,6 @@ cnt = np.array(calculate_cluster_centers(labels, coordinate, c_size)[0])
 plt.scatter(cnt[:,0], cnt[:,1], s=100, marker="x", color="red")
 
 plt.show()
-
-# %% [markdown]
-# ## 1.4 クラスタ半径を求める関数
-
-# %% [markdown]
-# $$
-#     \textrm{中心座標　} \ \vec{r_g}= (x_g, y_g)\\
-#     \textrm{クラスタ半径　} \ \vec{R} = \sqrt{\sum_{i=1}^{n}(\vec{r_i}-\vec{r_g})^2} 
-# $$
-
-# %% [markdown]
-# $$
-#     \sqrt{\sum_{i=1}^{n}((x_i-a)^2 + (y_i-a)^2)}
-# $$
-
-# %% [markdown]
-# **半径を求めるために使用した式(クラスタの一番端を採用)**  →  
-# $$
-#     \textrm{中心座標　} \ \vec{r_g}= (x_g, y_g)\\
-#     \textrm{点の座標　} \ \vec{r_p}= (x_p, y_p)\\
-#     R=\sqrt{(x_p - x_g)^2+(y_p - y_g)^2}
-# $$
-
-# %%
-import math
-
-def calculate_radius(arg1, arg2):
-    '''
-    引数
-    arg1 --> 各点の座標リスト [[x1,y1], [x2,y2], ....]
-    arg2 --> 中心座標 [x, y]
-    '''
-    points = np.array(arg1)
-    center = np.array(arg2)
-
-    R = 0
-
-    for point in points:
-        a = np.abs(point-center) # ベクトルの差
-        r = math.sqrt(a[0]**2 + a[1]**2)
-        if r > R:
-            R = r
-    return R
-
 
 # %% [markdown]
 # # ■実験結果
@@ -387,6 +386,7 @@ def plot_coordinate_by_time(str, num1, num2, num3):
         plt.show()
 
 # %%
+# 1000秒目から13000秒目まで（1000秒ごと）
 for i in range(10000, 130000, 10000):
     plot_coordinate_by_time("single", 35, i, i)
 
@@ -396,26 +396,30 @@ for i in range(10000, 130000, 10000):
 # %% [markdown]
 # クラスタの最大半径とその時のクラスタサイズを描画
 
+# %% [markdown]
+# ### 最大半径を持つクラスタの中心と最小半径を持つクラスタの中心をプロット
+
 # %%
 # %%time
 
-# y_radius = []
-# y_clustersize = []
-
-time_start = 0
+time_start = 50000
 time_end = 100000
 span = 10000
-# x = [s for s in range(time_start, time_end+1)]
 
-# coordinate_of_max_center = []
-# coordinate_of_centers = []
-
+list_of_max_radius = []
+list_of_min_radius = []
+list_of_max_clustersize = []
+list_of_min_clustersize = []
 
 for i in range(time_start, time_end, span):
-    y_radius = []
-    y_clustersize = []
+    y_max_radius = [] # 最大半径
+    y_max_clustersize = [] # 最大半径を持つクラスタのサイズ
     coordinate_of_max_center = []
-    coordinate_of_centers = []
+    
+    y_min_radius = [] # 最小半径
+    y_min_clustersize = [] # 最小半径を持つクラスタのサイズ
+    coordinate_of_min_center = []
+    
     for j in range(i, i+span):
         distance_threshold = 35
         model = hierachical_clustering("single", j, distance_threshold)[3]
@@ -428,100 +432,77 @@ for i in range(time_start, time_end, span):
 
         clusters_size = np.bincount(labels) # <-- ラベル別のクラスタサイズ
 
-        n = sum(x>1 for x in clusters_size) # <--クラスタサイズが1より大きいものの数
-
         # クラスタの中心座標
         centers = calculate_cluster_centers(labels, X, clusters_size)[0]    
         cnt = np.array(centers)
 
-        coordinate_of_centers.append(centers)
-
         # クラスタ半径
         radius = calculate_cluster_centers(labels, X, clusters_size)[1]
-
+        
+        # クラスタサイズが1以上
+        clusters_size_without_size1 = clusters_size[clusters_size != 1]
+        
+        # max
         maxradius = max(radius)
         max_index = radius.index(maxradius)
-
-        y_radius.append(maxradius)
-        y_clustersize.append(clusters_size[max_index])
+        
+        y_max_radius.append(maxradius)
+        y_max_clustersize.append(clusters_size_without_size1[max_index])
 
         coordinate_of_max_center.append(centers[max_index])
+        
+        # min
+        minradius = min(radius)
+        min_index = radius.index(minradius)
+        
+        y_min_radius.append(minradius)
+        y_min_clustersize.append(clusters_size_without_size1[min_index])
+
+        coordinate_of_min_center.append(centers[min_index])
     
-    plt.figure(figsize=(6,6))
+    list_of_max_radius += y_max_radius
+    list_of_min_radius += y_min_radius
+    
+    list_of_max_clustersize += y_max_clustersize
+    list_of_min_clustersize += y_min_clustersize
+    
+    fig = plt.figure(figsize=(12, 6))
+    # plot max centers
+    ax1 = fig.add_subplot(1,2,1)
     values = np.array(coordinate_of_max_center)
-    plt.scatter(values[:, 0],values[:, 1], marker="x")
-    plt.xlim(0, 430)
-    plt.ylim(0, 430)
-    plt.title("Location of the cluster center with the maximum radius \n time=%d - %d (s)" %(i /10, (i+span)/10))
+    ax1.scatter(values[:, 0],values[:, 1], marker="x", alpha=0.5)
+    ax1.set_title("Location of the cluster center with the maximum radius \n time=%d - %d (s)" %(i/10, (i+span)/10))
+    ax1.set_xlim(0, 430)
+    ax1.set_ylim(0, 430)
+    # plt.figure(figsize=(6,6))
+    # plt.scatter(values[:, 0],values[:, 1], marker="x", alpha=0.5)
+    # plt.xlim(0, 430)
+    # plt.ylim(0, 430)
+    # plt.title("Location of the cluster center with the maximum radius \n time=%d - %d (s)" %(i, i+span))
+    
+    # plot min centers
+    ax2 = fig.add_subplot(1,2,2)
+    min_values = np.array(coordinate_of_min_center)
+    ax2.scatter(min_values[:, 0],min_values[:, 1], marker="x", color="red", alpha=0.5)
+    ax2.set_title("Location of the cluster center with the minimum radius \n time=%d - %d (s)" %(i/10, (i+span)/10))
+    ax2.set_xlim(0, 430)
+    ax2.set_ylim(0, 430)
+    
+    # plt.figure(figsize=(6,6))
+    # min_values = np.array(coordinate_of_min_center)
+    # plt.scatter(min_values[:, 0],min_values[:, 1], marker="x", color="red", alpha=0.5)
+    # plt.xlim(0, 430)
+    # plt.ylim(0, 430)
+    # plt.title("Location of the cluster center with the minimum radius \n time=%d - %d (s)" %(i, i+span))
+    
 
 # %% [markdown]
 # 10000行実行→2min 38s
 
-# %%
-plt.figure(figsize=(6,6))
-values = np.array(coordinate_of_max_center)
-plt.scatter(values[:, 0],values[:, 1], marker="x")
-plt.xlim(0, 430)
-plt.ylim(0, 430)
-plt.title("Location of the cluster center with the maximum radius \n time=%d - %d (s)" %(time_start /10, time_end/10))
-
-# %%
-# %%time
-
-y_radius1 = []
-y_clustersize1 = []
-
-time_start = 0
-time_end = 10000
-x = [s for s in range(time_start, time_end+1)]
-
-coordinate_of_min_center = []
-coordinate_of_centers = []
-
-for i in range(time_start, time_end+1):
-    distance_threshold = 35
-    model = hierachical_clustering("single", i, distance_threshold)[3]
-
-    nclusters = model.n_clusters_ # クラスタサイズ1を含めた全クラスタ数
-
-    X = np.array(hierachical_clustering("single", i, distance_threshold)[2]) # 各点の座標データ
-
-    labels = model.labels_
-
-    clusters_size = np.bincount(labels) # <-- ラベル別のクラスタサイズ
-
-    n = sum(x>1 for x in clusters_size) # <--クラスタサイズが1より大きいものの数
-
-    # クラスタの中心座標
-    centers = calculate_cluster_centers(labels, X, clusters_size)[0]    
-    cnt = np.array(centers)
-    
-    coordinate_of_centers.append(centers)
-    
-    # クラスタ半径
-    radius = calculate_cluster_centers(labels, X, clusters_size)[1]
-    
-    # min
-    minradius = min(radius)
-    min_index = radius.index(minradius)
-    
-    y_radius1.append(minradius)
-    y_clustersize1.append(clusters_size[min_index])
-    
-    coordinate_of_min_center.append(centers[min_index])
-
-# %%
-plt.figure(figsize=(6,6))
-minvalues = np.array(coordinate_of_min_center)
-plt.scatter(minvalues[:, 0],minvalues[:, 1], marker="x")
-plt.xlim(0, 430)
-plt.ylim(0, 430)
-plt.title("Location of the cluster center with the minimum radius \n time=%d - %d" %(time_start, time_end))
-
 # %% [markdown]
 # ### 最大半径の時間変化とクラスタサイズ
 
-# %%
+# %% jupyter={"source_hidden": true}
 #グラフを表示する領域を，figオブジェクトとして作成。
 fig = plt.figure(figsize = (25,9))
 
@@ -530,10 +511,10 @@ ax1 = fig.add_subplot(2, 1, 1)
 ax2 = fig.add_subplot(2, 1, 2)
 
 # selected time
-x = [s/10 for s in range(time_start, time_end+1)]
+x = [s/10 for s in range(time_start, time_end)]
 
-ax1.plot(np.array(x), np.array(y_radius))
-ax2.plot(np.array(x), np.array(y_clustersize))
+ax1.plot(np.array(x), np.array(list_of_max_radius))
+ax2.plot(np.array(x), np.array(list_of_max_clustersize))
 
 ax1.set_ylabel("maximum value of radius")
 ax2.set_ylabel("clustersize")
@@ -552,22 +533,13 @@ plt.suptitle("the time variation of maximum value of radius and clustersize \n d
 plt.show()
 
 # %% [markdown]
-# ### フーリエ変換
+# #### フーリエ変換
 
 # %%
 # 実数部
-fk = np.fft.fft(y_radius-np.mean(y_radius))
+fk = np.fft.fft(list_of_max_radius-np.mean(list_of_max_radius))
 plt.plot((fk.real)**2+(fk.imag)**2)
-plt.xlim(0,100)
-
-# %% jupyter={"outputs_hidden": true}
-# 虚数部
-plt.plot(fk.imag)
-
-# %% jupyter={"outputs_hidden": true}
-# 周波数
-freq = np.fft.fftfreq(10001)
-plt.plot(freq)
+plt.xlim(0,1000)
 
 # %% [markdown] slideshow={"slide_type": "slide"}
 # ## クラスタ数と距離（クラスタサイズが1より大きいもののみ）
@@ -682,7 +654,8 @@ plt.show()
 
 # %% [markdown]
 # memo  
-# 距離の閾値が上がるほどクラスタ数の平均値が増える
+# 距離の閾値が上がるほどクラスタ数の平均値が増える  
+# ***4000秒くらいから安定***
 
 # %%
 fk1 = np.fft.fft(clusters2-np.mean(clusters2))
