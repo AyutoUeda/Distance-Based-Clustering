@@ -15,8 +15,13 @@
 
 ■関数
 ・hierachical_clustering
+
 戻り値：
+
     model.n_clusters_ --> クラスタ数（サイズ1を含む）
+    
     model.labels_ --> 各点のラベル（要素数60）
+    
     coordinate_data --> 引数で指定された時間における各点の座標(二次元配列、要素数60)
+    
     model --> 引数で指定されたlinkage, distance_thresholdをモデルに組み込む
