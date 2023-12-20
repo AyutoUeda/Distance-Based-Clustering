@@ -1,5 +1,5 @@
 # .gitignore for Python projects
-__pychace__/
+_pycache__/
 .ipynb_checkpoints/
 
 *.csv
