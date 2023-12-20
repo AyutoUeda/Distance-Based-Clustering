@@ -1,0 +1,7 @@
+# .gitignore for Python projects
+__pychace__/
+.ipynb_checkpoints/
+
+*.csv
+
+*.mp4
