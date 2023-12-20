@@ -1,32 +1,14 @@
-# ---
-# jupyter:
-#   jupytext:
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.14.6
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
-# %% [markdown]
 # ## 0619 やること  
 # 1. 最大半径の時間変化をフーリエ変換  
 # 2. 中心位置のコントロール  
 # 3. 計算時間の拡大 -> 0秒目から
 
-# %% slideshow={"slide_type": "skip"}
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.cluster import AgglomerativeClustering
 from scipy.cluster.hierarchy import dendrogram
-# %matplotlib inline
-# %config IPCompleter.greedy=True
 
 # データ準備
 df = pd.read_csv("all_result.csv")
@@ -35,48 +17,49 @@ from IPython.core.display import display, HTML
 display(HTML("<style>div.output_scroll { height: unset; }</style>"))
 
 
-# %% [markdown] slideshow={"slide_type": "slide"} toc-hr-collapsed=true jp-MarkdownHeadingCollapsed=true
+# %% [markdown] slideshow={"slide_type": "slide"} toc-hr-collapsed=true
 # # 1.関数作成  
 # ## 1.1 階層クラスタリング
 # 分析する行と距離の閾値を設定→モデルとラベルを返す
 
 # %% slideshow={"slide_type": "slide"}
-def hierachical_clustering(str, num1, num2):
-    '''
-    str --> 距離の測定方法
-    num1 --> 分析する秒数（行数）
-    num2 --> クラスタ間の距離
-    '''
+def hierachical_clustering(method="single", time, threshold):
+    """階層クラスタリングを実行する関数
+    
+    Args:
+        method (str): 距離の測定方法(default="single")  
+        time (int): 分析する秒数（行数） 
+        threshold (int): クラスタ間の距離の閾値  
+        
+    Returns:
+        model.n_clusters_ (int): クラスタ数
+        model.labels_ (list): 各点のラベル
+        coordinate_data (list): 指定した時間（行数）における各点の座標
+        model (model): モデル
+        
+    """
     coordinate_data = []
-    t = num1
+    
     # 何秒目をクラスタリングするか
     for i in range(0, 120, 2):
-      x = df.iloc[t][i]
-      y = df.iloc[t][i+1]
+      x = df.iloc[time][i]
+      y = df.iloc[time][i+1]
       coordinate_data.append([int(x), int(y)])
 
     # list --> array
     X = np.array(coordinate_data)
 
-    distance_threshold = num2
     model = AgglomerativeClustering(
-        n_clusters=None, linkage=str, compute_full_tree=True, distance_threshold=distance_threshold
+        n_clusters=None, linkage=str, compute_full_tree=True, distance_threshold=threshold
     )
 
     model.fit(X)
     
     return model.n_clusters_, model.labels_, coordinate_data, model
 
-'''
-戻り値
-coordinate_data --> 指定した行数における各点の座標 
-'''
 
-
-# %% [markdown]
 # ## 1.2 クラスタサイズが1のものを除く関数
 
-# %% slideshow={"slide_type": "slide"}
 def exception_size1(labels):
     labels = hierachical_clustering("single",10000,35)[1] # 各点のラベル
     print(labels)
@@ -208,12 +191,20 @@ def calculate_cluster_centers(labels, coordinate, c_size):
 # c_size --> ラベルごとのクラスタサイズ　([9,3,2,1...] <-- クラスタラベル1のサイズは9、クラスタラベル2のサイズは2...)
 
 # %%
+ccc=np.array(coordinate)
+fig = plt.figure(figsize=(10,10))
+ax = fig.add_subplot(111)
+plt.scatter(ccc[:,0], ccc[:,1])
+plt.axis('square')
+plt.xlim(0,430)
+plt.ylim(0,430)
+
+# %%
 # 位置とクラスタ番号の描画
 fig = plt.figure(figsize=(6,6))
 
 tstX = np.array(coordinate)
 plt.scatter(tstX[:,0], tstX[:,1], c=labels) #cmap="viridis")
-
 
 clusters_size = np.bincount(labels) # <-- ラベル別のクラスタサイズ
 
@@ -331,12 +322,13 @@ def plot_coordinate_by_time(str, num1, num2, num3):
     distance_threshold = num1
     
     for i in range(num2, num3+1):
-        model = hierachical_clustering(str, i, distance_threshold)[3]
+        _, _, coordinatedata, model = hierachical_clustering(str, i, distance_threshold)
         
         nclusters = model.n_clusters_ # クラスタサイズ1を含めた全クラスタ数
 
-        X = np.array(hierachical_clustering(str, i, distance_threshold)[2]) # 各点の座標データ
+        # X = np.array(hierachical_clustering(str, i, distance_threshold)[2]) # 各点の座標データ
         
+        X = np.array(coordinatedata)
         
         # 位置とクラスタ番号の描画
         fig, ax = plt.subplots(figsize=(6,6))
@@ -375,11 +367,12 @@ def plot_coordinate_by_time(str, num1, num2, num3):
     
         
         
-        plt.title("distance based (%s) \n time = %d (s) \n distance_threshold = %d, n_clusters=%d (all=%d) \n maxradius=%1.2f" 
-                  %(str, i/10, distance_threshold, n, nclusters, maxradius))
+        plt.title("distance based (time = %d (s)) \n distance_threshold = %d, n_clusters=%d (all=%d) \n maxradius=%1.2f" 
+                  %(i/10, distance_threshold, n, nclusters, maxradius))
 
         plt.xlim(0, 430)
         plt.ylim(0, 430)
+        # plt.savefig("outputs/hierarchical_clustering/hierarchical_time_{}.png".format(int(i/10)), bbox_inches='tight')
         plt.show()
 
 
@@ -856,25 +849,30 @@ for i in range(start_time, end_time, span):
 # %%time
 from matplotlib.animation import FuncAnimation, ArtistAnimation
 from IPython.display import HTML
+import pathlib
+import matplotlib
+
+matplotlib.rcParams['animation.embed_limit'] = 2**128
 
 # Initialize scatter plot
 fig, ax = plt.subplots(figsize=(6,6))
 scatter = ax.scatter([], [])
 center = ax.scatter([], [])
-
+ax.set_title("Hierachical Clustering (single) \n distance threshold=35")
 # Set plot properties
 ax.set_xlim(0, 450)
 ax.set_ylim(0, 450)
 ax.set_xlabel('X')
 ax.set_ylabel('Y')
 
-# Define function to update scatter position
+timestart = 108000
+# -----Define function to update scatter position-----
 def update_scatter(i):
     # どこからスタートさせるか
-    i = i+100000
+    i = i+1+timestart
     ax.cla()
-    ax.set_xlim(0, 450)
-    ax.set_ylim(0, 450)
+    ax.set_xlim(0, 430)
+    ax.set_ylim(0, 430)
     model = hierachical_clustering("single", i, 35)[3]
     labels, data = hierachical_clustering("single",i,35)[1], hierachical_clustering("single", i,35)[2]
     x, y = zip(*data)
@@ -899,15 +897,17 @@ def update_scatter(i):
         else:
             c = patches.Circle(center, r, alpha=0.2,facecolor='blue', edgecolor='black')
             ax.add_patch(c)
-    return scatter, center
+    
+    text = ax.text(20, 400, "%1.1f (s)" %(i/10))
+    return scatter, center, text
 
 # Animate scatter plot
 # フレーム数を変化させることで表示範囲を変更
-ani = FuncAnimation(fig, update_scatter, frames=700, interval=100)
-HTML(ani.to_jshtml())
+ani = FuncAnimation(fig, update_scatter, frames=18000, interval=100)
+# HTML(ani.to_jshtml())
+# ani.save("outputs/animation_of_droplets_from%d.mp4" %(timestart/10))
 
-
-# %% [markdown] jp-MarkdownHeadingCollapsed=true
+# %% [markdown]
 # ## 樹形図
 
 # %%
@@ -933,15 +933,23 @@ def plot_dendrogram(model, **kwargs):
    dendrogram(linkage_matrix, leaf_font_size=12, **kwargs)
 
 
-# %% jupyter={"outputs_hidden": true}
-# 樹形図の描画
-plt.figure(figsize=(20,10))
-plt.title('Euclidean, linkage=single')
-# plot the top three levels of the dendrogram
-plot_dendrogram(hierachical_clustering(1000,30)[3], truncate_mode='level', p=10)
-plt.xlabel("Number of points in node (or index of point if no parenthesis).")
-plt.ylabel("Distance")
-ax = fig.add_subplot(111)
+# %%
+for i in range(0, 130000, 20000):
+    model = hierachical_clustering("single", i, 35)[3]
+    # 樹形図の描画
+    fig = plt.figure(figsize=(20,10), facecolor="white")
+    ax = fig.add_subplot(111)
+    
+    ax.set_title('Dendrogram of Hierarchical Clustering \n Euclidean, linkage=single \n distance threshold=35, time=%d (s)' %(i/10))
+    # plot the top three levels of the dendrogram
+    plot_dendrogram(model, truncate_mode='level', p=10)
+    ax.set_xlabel("Number of points in node (or index of point if no parenthesis).")
+    ax.set_ylabel("Distance")
+    
 
-# plt.plot([0, 40],[40, 40], "red", linestyle='dashed') 
-plt.show()
+    ax.plot([0, 1000],[35, 35], "red", linestyle='dashed', label="distance threshold") 
+    ax.legend()
+    # fig.savefig("outputs/dendrogram/dendrogram_at_%d.png" %(i/10), transparent=False)
+    plt.show()
+
+# %%
