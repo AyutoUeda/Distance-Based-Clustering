@@ -15,6 +15,9 @@ def plot_coordinate(data, lower_threshold, upper_threshold, time_analyze, method
         time_analyze (```int```): 分析する秒数（行数） 
         method (```str```): 距離の測定方法(default="single")
         save_fig (```bool```): 図を保存するかどうか(default=False)
+        
+    Examples:
+        >>> plot_coordinate(data, 33, 35, 10000, "single", save_fig=False)
     
     """
     # 図の書式設定
