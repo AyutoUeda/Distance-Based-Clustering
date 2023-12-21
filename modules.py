@@ -69,7 +69,6 @@ def calculate_radius(coordinate, center_coordinate):
     Returns:
         R (```float```): 半径
         
-    
     """
 
     points = np.array(coordinate)
