@@ -8,6 +8,9 @@ import matplotlib.patches as patches
 def plot_coordinate(data, lower_threshold, upper_threshold, time_analyze, method="single", save_fig=False): 
     """指定された行数（時間）における座標データとクラスタをプロットする関数
     
+    指定された行数（時間）における座標データに対して、lowerからupperまでのthresholdを用いてクラスタリング。
+    結果をプロット。
+    
     Args:
         data (```dataframe```): 座標データ
         lower_threshold (```int```): 閾値の下限
