@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 
-def plot_coordinate(data, lower_threshold, upper_threshold, time_analyze, method="single"): 
+def plot_coordinate(data, lower_threshold, upper_threshold, time_analyze, method="single", save_fig=False): 
     """指定された行数（時間）における座標データとクラスタをプロットする関数
     
     Args:
@@ -14,8 +14,26 @@ def plot_coordinate(data, lower_threshold, upper_threshold, time_analyze, method
         upper_threshold (```int```): 閾値の上限
         time_analyze (```int```): 分析する秒数（行数） 
         method (```str```): 距離の測定方法(default="single")
+        save_fig (```bool```): 図を保存するかどうか(default=False)
     
     """
+    # 図の書式設定
+    plt.rcParams['mathtext.fontset'] = 'stix' # math fontの設定
+    plt.rcParams['xtick.labelsize'] = 9 # 軸だけ変更されます。
+    plt.rcParams['ytick.labelsize'] = 9 # 軸だけ変更されます
+    plt.rcParams['xtick.direction'] = 'in' # x axis in
+    plt.rcParams['ytick.direction'] = 'in' # y axis in 
+    plt.rcParams['axes.linewidth'] = 1.0 # axis line width
+    plt.rcParams['axes.grid'] = True # make grid
+    plt.rcParams["legend.fancybox"] = False # 丸角
+    plt.rcParams["legend.framealpha"] = 1 # 透明度の指定、0で塗りつぶしなし
+    plt.rcParams["legend.edgecolor"] = 'black' # edgeの色を変更
+    plt.rcParams["legend.handlelength"] = 1 # 凡例の線の長さを調節
+    plt.rcParams["legend.labelspacing"] = 5. # 垂直方向の距離の各凡例の距離
+    plt.rcParams["legend.handletextpad"] = 3. # 凡例の線と文字の距離の長さ
+    plt.rcParams["legend.markerscale"] = 2 # 点がある場合のmarker scale
+    plt.rcParams["legend.borderaxespad"] = 0. # 凡例の端とグラフの端を合わせる
+    
 
     for distance_threshold in range(lower_threshold, upper_threshold+1):
         
@@ -29,13 +47,13 @@ def plot_coordinate(data, lower_threshold, upper_threshold, time_analyze, method
         
         # 位置とクラスタ番号の描画
         fig, ax = plt.subplots(figsize=(6,6))
-        plt.scatter(X[:,0], X[:,1], c=model.labels_) #cmap="viridis")
+        plt.scatter(X[:,0], X[:,1], c="steelblue") #cmap="viridis")
 
 
 
         clusters_size = np.bincount(labels) # <-- ラベル別のクラスタサイズ
 
-        n = sum(x>1 for x in clusters_size) # <--クラスタサイズが1より大きいものの数
+        n_withoutsize1 = sum(x>1 for x in clusters_size) # <--クラスタサイズが1より大きいものの数
 
         # print(clusters_size)
 
@@ -65,12 +83,18 @@ def plot_coordinate(data, lower_threshold, upper_threshold, time_analyze, method
     
         
         
-        plt.title("distance based (%s) \n distance_threshold = %d, n_clusters=%d (all=%d) \n maxradius=%1.2f" %(method, distance_threshold, n, n_clusters, maxradius))
+        plt.title("Hierarchical Clustering (%s) \n distance_threshold = %d, n_clusters=%d (all=%d) \n maxradius=%1.2f" 
+                  %(method, distance_threshold, n_withoutsize1, n_clusters, maxradius))
 
         plt.xlim(0, 430)
         plt.ylim(0, 430)
-        plt.show()
+        # plt.show()
+        
+        fig_path = "HC_{}s_threshold{}.png".format(time_analyze, distance_threshold)
+        
+        if save_fig:
+            fig.savefig(fig_path, bbox_inches="tight", pad_inches=0.05)
         
 if __name__ == "__main__":
     data = pd.read_csv("all_result.csv", header=None)
-    plot_coordinate(data, 33, 35, 10000, "single")
+    plot_coordinate(data, 33, 35, 10000, "single", save_fig=False)
