@@ -110,7 +110,7 @@ def calculate_center(coordinates: list):
     return center_coordinate
 
 def calculate_cluster_centers(labels, coordinate, c_size):
-    """クラスタの中心をすべて計算する関数
+    """クラスタの中心と半径をすべて計算する関数
     
     Args:
         labels (```list```): 各点のクラスタラベル
@@ -149,7 +149,7 @@ if __name__ == "__main__":
     
     data = pd.DataFrame([[1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 54,33], 
                         [1, 2, 1, 2, 1, 2, 1, 2, 1, 2]])
-    n_clusters, labels, coordinate_data, model = hierachical_clustering(data, 0, 2, "single")
+    n_clusters, labels, coordinate_data, model = hierarchical_clustering(data, 0, 2, "single")
 
     # labels = [0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 3]
     exception_size1(labels)
