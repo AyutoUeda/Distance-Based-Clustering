@@ -5,7 +5,7 @@ from sklearn.cluster import AgglomerativeClustering
 import math
 
 
-def hierachical_clustering(data, time_analyze, threshold, method="single"):
+def hierarchical_clustering(data, time_analyze, threshold, method="single"):
     """階層クラスタリングを実行する関数
     
     任意の時間における座標データに対し、階層クラスタリングを実行.

@@ -1,4 +1,4 @@
-from modules import hierachical_clustering, calculate_cluster_centers
+from modules import hierarchical_clustering, calculate_cluster_centers
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -43,7 +43,7 @@ def plot_coordinate(data, lower_threshold, upper_threshold, time_analyze, method
 
     for distance_threshold in range(lower_threshold, upper_threshold+1):
         
-        n_clusters, labels, coordinate_data, model = hierachical_clustering(data, 
+        n_clusters, labels, coordinate_data, model = hierarchical_clustering(data, 
                                                                             time_analyze, 
                                                                             distance_threshold, 
                                                                             "single")

@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import csv
-from modules import hierachical_clustering, calculate_cluster_centers
+from modules import hierarchical_clustering, calculate_cluster_centers
 
 
 def time_variation(data, threshold=35, method="single"):
@@ -39,7 +39,7 @@ def time_variation(data, threshold=35, method="single"):
     }  
 
     for time_analyze in range(0, len(data)):    
-        _, labels, coordinate_data, _ = hierachical_clustering(data, 
+        _, labels, coordinate_data, _ = hierarchical_clustering(data, 
                                                                 time_analyze, 
                                                                 threshold=threshold, 
                                                                 method=method)
