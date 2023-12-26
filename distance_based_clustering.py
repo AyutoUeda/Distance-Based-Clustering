@@ -96,11 +96,12 @@ def plot_coordinate(data, lower_threshold, upper_threshold, time_analyze, method
         plt.ylim(0, 430)
         # plt.show()
         
-        fig_path = "HC_{}s_threshold{}.png".format(time_analyze, distance_threshold)
+        fig_path = "outputs/hierarchical_clustering/HC_{}s_threshold{}.png".format(time_analyze, distance_threshold)
         
         if save_fig:
             fig.savefig(fig_path, bbox_inches="tight", pad_inches=0.05)
         
 if __name__ == "__main__":
-    data = pd.read_csv("all_result.csv", header=None)
-    plot_coordinate(data, 33, 35, 10000, "single", save_fig=False)
+    data = pd.read_csv("all_result.csv")
+    for i in range(0, 120000, 1000):
+        plot_coordinate(data, 35, 35, i, "single", save_fig=True)
