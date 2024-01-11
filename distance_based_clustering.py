@@ -1,3 +1,12 @@
+"""
+【階層クラスタリングを実行し、その半径と中心座標をプロットする関数を定義したモジュール】
+
+Example:
+    >>> data = pd.read_csv("all_result.csv")
+    >>> # 0行目から10000行目までのデータに対して、1000行ごとに閾値35を用いてクラスタリング
+    >>> for i in range(0, 10000, 1000):
+    >>>     plot_coordinate(data, 35, 35, i, "single", save_fig=True)
+"""
 from modules import hierarchical_clustering, calculate_cluster_centers
 import pandas as pd
 import numpy as np
@@ -103,5 +112,5 @@ def plot_coordinate(data, lower_threshold, upper_threshold, time_analyze, method
         
 if __name__ == "__main__":
     data = pd.read_csv("all_result.csv")
-    for i in range(0, 120000, 1000):
+    for i in range(120000, 121000, 1000):
         plot_coordinate(data, 35, 35, i, "single", save_fig=True)
