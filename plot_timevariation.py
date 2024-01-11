@@ -1,3 +1,11 @@
+"""
+【時間変化を出力するためのプログラム】
+
+1. time_variation.csvを読み込む
+2. 各列をプロットする
+
+"""
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
