@@ -6,7 +6,7 @@
 
 |name of function | function|
 | --------------- | ------- |
-| hierarchical_clustering | 指定された行数（時間）における座標データとクラスタをプロットする関数|
+| hierarchical_clustering | 指定された行数（時間）における座標データとクラスタを計算|
 | exception_size1  | ラスタサイズが1のものを除いた際のクラスタ数を返す関数|
 | calculate_radius | 半径を計算する関数|
 | calculate_center | クラスタの中心座標を計算する関数|
@@ -28,19 +28,26 @@ centers, list_of_radius = calculate_cluster_centers(labels, coordinate_data, np.
 ```
 
 ## distance_based_clustering.py
-modules.pyの関数を用いてデータの各時間におけるクラスタリングを実行。
+modules.pyの関数を用いてデータの各時間におけるクラスタリングを実行。  
 その際の図も保存。
+```distance_based_clustering.py
+data = pd.read_csv("all_result.csv")
+# 0行目から10000行目までのデータに対して、1000行ごとに閾値35を用いてクラスタリング
+# save_figで図を保存するかを指定
+for i in range(0, 10000, 1000):
+   plot_coordinate(data, 35, 35, i, "single", save_fig=True)
+```
 
-## ■関数
+## time_variation_analysis.py
+すべての時間に対して、クラスタ数、最大クラスタサイズ、最小クラスタサイズ、最大半径、最小半径を調べる。
+クラスタ数はクラスタサイズが1より大きいものの数を表す。  
+戻り値は辞書型。  
+Returns (```dict```):
+- n_clusters (```list```): クラスタ数  
+- max_clustersize (```list```): 最大クラスタサイズ  
+- min_clustersize (```list```): 最小クラスタサイズ(size1を除く)  
+- max_radius (```list```): 最大半径  
+- min_radius (```list```): 最小半径
 
-・hierachical_clustering
-
-戻り値：
-
-    model.n_clusters_ --> クラスタ数（サイズ1を含む）
-    
-    model.labels_ --> 各点のラベル（要素数60）
-    
-    coordinate_data --> 引数で指定された時間における各点の座標(二次元配列、要素数60)
-    
-    model --> 引数で指定されたlinkage, distance_thresholdをモデルに組み込む
+## plot_timevariation.py
+time_variation_analysis.pyで求めた結果をプロットするプログラム。
