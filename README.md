@@ -1,6 +1,6 @@
 # Hierarchical Clustering
 
-## ```modules.py```
+## modules.py
 
 階層クラスタリングに使用する基本的な関数群
 
@@ -27,6 +27,9 @@ centers, list_of_radius = calculate_cluster_centers(labels, coordinate_data, np.
 
 ```
 
+## distance_based_clustering.py
+modules.pyの関数を用いてデータの各時間におけるクラスタリングを実行。
+その際の図も保存。
 
 ## ■関数
 
