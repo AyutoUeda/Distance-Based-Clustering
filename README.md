@@ -15,40 +15,18 @@
 **Example**
   
 ```modules.py
-
+# データフレームを入力とする
 data = pd.DataFrame([[1, 1, 2, 2, 3, 3, 4, 4, 5, 5], 
                      [1, 1, 2, 2, 3, 3, 4, 4, 5, 5]])
 
+# ある時間における「クラスタ数」、「そのクラスタのラベル」、「座標」を返す
 n_clusters, labels, coordinate_data, model = hierarchical_clustering(data, time_analyze=0, threshold=2, "single")
 
+# 上で求めたラベルと座標をもとにクラスタの中心を計算
 centers, list_of_radius = calculate_cluster_centers(labels, coordinate_data, np.bincount(labels))
 
 ```
 
-
-## ■進捗
-
-- 6月12日
-
-円半径を求める
-
-- 6月19日
-
-最大半径の時間変化をフーリエ変換し、振動を見る
-
-最大半径を持つクラスタの中心のプロットを他のクラスタでも実行
-
-計算する範囲を拡大　(行の最大は13394）
-
-- 6.28
-
-全データのインポート（行数12万）--> all_result.csv
-
-- 7.4
-
-クラスタサイズ別に数をカウント（1000秒区切り）
-
-クラスタに含まれない粒子（サイズが1）をプロット
 
 ## ■関数
 
